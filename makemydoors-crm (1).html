@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Make My Doors — CRM</title>
+<style>
+:root{
+  --bg:#f7f5f2;--surface:#fff;--s2:#f0ede8;--brd:rgba(0,0,0,0.10);--brd2:rgba(0,0,0,0.17);
+  --tx:#1a1a1a;--mu:#6b6b6b;--acc:#2c2c2a;--br:#8b5e3c;--brl:#f5ede4;
+  --red:#c0392b;--grn:#27ae60;--blu:#2980b9;--r:10px;--rs:6px;
+  --shd:0 4px 16px rgba(0,0,0,0.11);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--tx);font-size:14px;min-height:100vh}
+
+/* ── LOGIN ── */
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
+.lb{background:var(--surface);border-radius:var(--r);border:1px solid var(--brd);padding:36px 30px;width:100%;max-width:380px;box-shadow:var(--shd)}
+.lb-logo{text-align:center;margin-bottom:28px}
+.lb-icon{font-size:44px;display:block;margin-bottom:10px}
+.lb-brand{font-size:21px;font-weight:700;color:var(--acc);letter-spacing:-.3px}
+.lb-sub{font-size:13px;color:var(--mu);margin-top:4px}
+.lpw-lbl{font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;display:block;margin-bottom:7px}
+.lpw-in{width:100%;padding:11px 13px;border:1px solid var(--brd2);border-radius:var(--rs);font-size:15px;background:var(--s2);outline:none;font-family:inherit;letter-spacing:2px;margin-bottom:14px}
+.lpw-in:focus{border-color:var(--br)}
+.lerr{color:var(--red);font-size:12px;text-align:center;margin-bottom:10px;display:none}
+.lhint{font-size:11px;color:var(--mu);text-align:center;margin-top:10px;line-height:1.6}
+.lhint code{background:var(--s2);padding:1px 5px;border-radius:3px;font-size:11px}
+.btn-lgn{width:100%;padding:12px;background:var(--br);color:white;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s}
+.btn-lgn:hover{background:#7a5234}
+
+/* ── APP ── */
+.app{display:none;flex-direction:column;min-height:100vh}
+.app.on{display:flex}
+.topbar{background:var(--acc);color:white;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.tl{display:flex;align-items:center;gap:10px}
+.t-logo{width:28px;height:28px;background:var(--br);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:15px}
+.t-name{font-size:15px;font-weight:600}
+.tr{display:flex;align-items:center;gap:8px}
+.sbadge{padding:3px 11px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.sb-br{background:var(--br)}
+.sb-adm{background:#2980b9}
+.lout{background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);color:white;padding:4px 10px;border-radius:var(--rs);font-size:12px;cursor:pointer;font-family:inherit}
+.lout:hover{background:rgba(255,255,255,.25)}
+
+/* ── NAV ── */
+.nav{background:var(--surface);border-bottom:1px solid var(--brd);overflow-x:auto;display:flex;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nt{padding:12px 15px;font-size:13px;font-weight:500;color:var(--mu);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .15s;font-family:inherit}
+.nt:hover{color:var(--tx)}
+.nt.active{color:var(--br);border-bottom-color:var(--br)}
+.nt.adm.active{color:#2980b9;border-bottom-color:#2980b9}
+
+/* ── PAGES ── */
+.page{display:none;padding:16px;max-width:1100px;margin:0 auto;width:100%}
+.page.active{display:block}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border-radius:var(--r);border:1px solid var(--brd);padding:16px;margin-bottom:14px}
+.ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.ct{font-size:12px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.5px}
+
+/* ── STATS ── */
+.sg{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px}
+@media(min-width:560px){.sg{grid-template-columns:repeat(4,1fr)}}
+.sc2{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r);padding:14px 16px}
+.sl{font-size:11px;color:var(--mu);font-weight:500;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.sv{font-size:26px;font-weight:700;line-height:1}
+.ss{font-size:11px;color:var(--mu);margin-top:3px}
+
+/* ── ADMIN BANNERS ── */
+.ab{border-radius:var(--r);padding:16px 18px;margin-bottom:14px;color:white}
+.ab-blu{background:linear-gradient(135deg,#1e3a5f,#2980b9)}
+.ab-drk{background:linear-gradient(135deg,#1a1a1a,#2c2c2a)}
+.ab-t{font-size:15px;font-weight:700}
+.ab-s{font-size:12px;opacity:.8;margin-top:3px}
+.ab-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
+.bpills{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.bpill{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.3)}
+
+/* ── BRANCH SWITCHER (admin) ── */
+.bsw{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+.bsw-btn{padding:7px 15px;border-radius:20px;border:1px solid var(--brd2);background:var(--s2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;font-family:inherit;color:var(--tx)}
+.bsw-btn:hover{background:var(--brd)}
+.bsw-btn.all.on{background:var(--acc);color:white;border-color:var(--acc)}
+.bsw-btn.br-on{background:var(--br);color:white;border-color:var(--br)}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:var(--rs);font-size:13px;font-weight:500;border:none;cursor:pointer;transition:all .15s;font-family:inherit}
+.bp2{background:var(--br);color:white}.bp2:hover{background:#7a5234}
+.bs{background:var(--s2);color:var(--tx);border:1px solid var(--brd2)}.bs:hover{background:var(--brd)}
+.bd{background:#fdf0ef;color:var(--red);border:1px solid #f5c6c2}
+.bsm{padding:5px 10px;font-size:12px}
+
+/* ── TOOLBAR ── */
+.tb{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center}
+.srch{display:flex;align-items:center;gap:6px;background:var(--surface);border:1px solid var(--brd2);border-radius:var(--rs);padding:7px 10px;flex:1;min-width:140px}
+.srch input{border:none;background:none;outline:none;font-size:13px;color:var(--tx);width:100%}
+select.flt{background:var(--surface);border:1px solid var(--brd2);border-radius:var(--rs);padding:7px 10px;font-size:13px;color:var(--tx);outline:none;font-family:inherit}
+
+/* ── TABLE ── */
+.tw{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:8px 10px;font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;border-bottom:1px solid var(--brd);white-space:nowrap}
+td{padding:10px;border-bottom:1px solid var(--brd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--brl)}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.bpnd{background:#fef3e2;color:#b45309}
+.bins{background:#d1fae5;color:#065f46}
+.bcnc{background:#fee2e2;color:#991b1b}
+.bmsr{background:#e0e7ff;color:#3730a3}
+.bprd{background:#fce7f3;color:#9d174d}
+.brdy{background:#dbeafe;color:#1e40af}
+.bsrc{background:var(--brl);color:var(--br)}
+.bbrn{background:var(--s2);color:var(--mu);border:1px solid var(--brd2)}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+.mo.open{display:flex}
+.md{background:var(--surface);border-radius:var(--r);width:100%;max-width:560px;margin:auto;box-shadow:var(--shd);animation:sup .2s ease}
+@keyframes sup{from{transform:translateY(18px);opacity:0}to{transform:translateY(0);opacity:1}}
+.mh{padding:16px 20px 12px;border-bottom:1px solid var(--brd);display:flex;align-items:center;justify-content:space-between}
+.mt{font-size:15px;font-weight:700}
+.mb2{padding:16px 20px;max-height:72vh;overflow-y:auto}
+.mf{padding:12px 20px;border-top:1px solid var(--brd);display:flex;gap:8px;justify-content:flex-end}
+.xb{background:none;border:none;font-size:18px;cursor:pointer;color:var(--mu);padding:2px 6px}
+
+/* ── FORM ── */
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.fr1{grid-template-columns:1fr}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.3px}
+.fg input,.fg select,.fg textarea{background:var(--s2);border:1px solid var(--brd2);border-radius:var(--rs);padding:8px 10px;font-size:13px;color:var(--tx);outline:none;font-family:inherit;transition:border .15s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--br)}
+.fg textarea{resize:vertical;min-height:68px}
+.fsec{margin-bottom:16px}
+.fst{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--br);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--brl)}
+
+/* ── DOOR ITEMS ── */
+.di{background:var(--s2);border-radius:var(--rs);padding:12px;margin-bottom:8px;border:1px solid var(--brd)}
+.dih{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.dil{font-size:12px;font-weight:700;color:var(--br)}
+
+/* ── IMAGE UPLOAD ── */
+.ua{border:2px dashed var(--brd2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--s2)}
+.ua:hover,.ua.ov{border-color:var(--br);background:var(--brl)}
+.ui{font-size:26px;margin-bottom:6px}
+.ut{font-size:13px;color:var(--mu)}.ut b{color:var(--br)}
+.igr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.pi{position:relative;aspect-ratio:1;border-radius:var(--rs);overflow:hidden;border:1px solid var(--brd)}
+.pi img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.pr{position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:white;border:none;border-radius:50%;width:20px;height:20px;cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center}
+.pl{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.55);color:white;font-size:10px;padding:3px 5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ── DETAIL VIEW ── */
+.dvh{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px}
+.dva{width:46px;height:46px;border-radius:50%;background:var(--br);color:white;display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:700;flex-shrink:0}
+.dvn{font-size:17px;font-weight:700}
+.dvm{font-size:13px;color:var(--mu);margin-top:2px}
+.dvg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.dvf label{font-size:11px;font-weight:700;color:var(--mu);text-transform:uppercase;letter-spacing:.3px}
+.dvf p{font-size:13px;margin-top:2px}
+.sdv{height:1px;background:var(--brd);margin:14px 0}
+.shg{font-size:13px;font-weight:700;margin-bottom:10px}
+.imgr{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.imgr img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--rs);border:1px solid var(--brd);cursor:pointer}
+
+/* ── EMPTY ── */
+.es{text-align:center;padding:36px 20px;color:var(--mu)}
+.ei{font-size:34px;margin-bottom:8px;opacity:.4}
+
+/* ── BRANCH MGT ── */
+.bcard{background:var(--surface);border:1px solid var(--brd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.brow{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--brd);gap:10px;flex-wrap:wrap}
+.brow:last-child{border-bottom:none}
+.bri .brl2{font-size:13px;font-weight:600}
+.bri .brs{font-size:12px;color:var(--mu);margin-top:2px}
+
+/* ── LIGHTBOX ── */
+.lbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:999;align-items:center;justify-content:center}
+.lbox.open{display:flex}
+.lbox img{max-width:90vw;max-height:90vh;border-radius:6px}
+.lbx{position:absolute;top:16px;right:20px;color:white;font-size:28px;cursor:pointer;background:none;border:none}
+
+@media(max-width:580px){
+  .fr{grid-template-columns:1fr}
+  .dvg{grid-template-columns:1fr}
+  .hm{display:none}
+  .sv{font-size:22px}
+  .page{padding:12px}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="lw" id="ls">
+  <div class="lb">
+    <div class="lb-logo">
+      <span class="lb-icon">🚪</span>
+      <div class="lb-brand">Make My Doors</div>
+      <div class="lb-sub">Enter your branch password to continue</div>
+    </div>
+    <label class="lpw-lbl">Password</label>
+    <input class="lpw-in" type="password" id="lpw" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <div class="lerr" id="lerr">Incorrect password. Please try again.</div>
+    <button class="btn-lgn" onclick="doLogin()">Sign In →</button>
+
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app">
+  <div class="topbar">
+    <div class="tl">
+      <div class="t-logo">🚪</div>
+      <div class="t-name">Make My Doors</div>
+    </div>
+    <div class="tr">
+      <span class="sbadge" id="sbadge"></span>
+      <button class="lout" onclick="doLogout()">Sign out</button>
+    </div>
+  </div>
+  <div class="nav" id="nav"></div>
+
+  <!-- DASHBOARD -->
+  <div class="page" id="page-dashboard">
+    <div id="ab-wrap"></div>
+    <div class="sg" id="dstats"></div>
+    <!-- ADMIN: per-branch switcher -->
+    <div id="pbsw"></div>
+    <div class="card">
+      <div class="ch"><div class="ct">Recent Customers</div><button class="btn bs bsm" onclick="sp('customers')">View all →</button></div>
+      <div class="tw"><table><thead><tr><th>Name</th><th>Phone</th><th>Source</th><th id="d-bth"></th></tr></thead><tbody id="d-ct"></tbody></table></div>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct">Recent Orders</div><button class="btn bs bsm" onclick="sp('orders')">View all →</button></div>
+      <div class="tw"><table><thead><tr><th>Order #</th><th>Customer</th><th>Doors</th><th>Status</th><th id="d-bth2"></th></tr></thead><tbody id="d-ot"></tbody></table></div>
+    </div>
+  </div>
+
+  <!-- CUSTOMERS -->
+  <div class="page" id="page-customers">
+    <div class="tb">
+      <div class="srch"><span>🔍</span><input type="text" id="cs-s" placeholder="Search customers…" oninput="renderC()"></div>
+      <select class="flt" id="cs-src" onchange="renderC()"><option value="">All Sources</option><option>Instagram</option><option>Walk-in</option><option>Builder</option><option>Designer</option><option>Referral</option><option>Other</option></select>
+      <div id="cs-bf"></div>
+      <button class="btn bp2" onclick="openCM()">+ New Customer</button>
+    </div>
+    <div class="card" style="padding:0"><div class="tw"><table>
+      <thead><tr><th>Name</th><th>Phone</th><th>Source</th><th id="c-bth"></th><th class="hm">Status</th><th></th></tr></thead>
+      <tbody id="ct2"></tbody>
+    </table></div></div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="page" id="page-orders">
+    <div class="tb">
+      <div class="srch"><span>🔍</span><input type="text" id="os-s" placeholder="Search orders…" oninput="renderO()"></div>
+      <select class="flt" id="os-st" onchange="renderO()"><option value="">All Statuses</option><option>Pending</option><option>Measuring</option><option>Production</option><option>Ready</option><option>Installed</option><option>Cancelled</option></select>
+      <div id="os-bf"></div>
+      <button class="btn bp2" onclick="openOM()">+ New Order</button>
+    </div>
+    <div class="card" style="padding:0"><div class="tw"><table>
+      <thead><tr><th>Order #</th><th>Customer</th><th>Doors</th><th>Status</th><th class="hm">Delivery</th><th id="o-bth"></th><th>📷</th><th></th></tr></thead>
+      <tbody id="ot2"></tbody>
+    </table></div></div>
+  </div>
+
+  <!-- ADMIN: BRANCHES -->
+  <div class="page" id="page-branches">
+    <div class="ab ab-drk ab-row">
+      <div><div class="ab-t">🏢 Branch Management</div><div class="ab-s">Add franchisees — each gets their own password</div></div>
+      <button class="btn bp2" onclick="openBM()">+ Add Branch</button>
+    </div>
+    <div id="blist"></div>
+  </div>
+
+  <!-- ADMIN: REPORTS -->
+  <div class="page" id="page-reports">
+    <div class="ab ab-blu" style="margin-bottom:14px">
+      <div class="ab-t">📊 Consolidated Reports</div>
+      <div class="ab-s">Cross-branch overview — admin only</div>
+    </div>
+    <div id="rep"></div>
+  </div>
+</div>
+
+<!-- CUSTOMER MODAL -->
+<div class="mo" id="mc"><div class="md">
+  <div class="mh"><div class="mt" id="mc-t">New Customer</div><button class="xb" onclick="closeM('mc')">✕</button></div>
+  <div class="mb2">
+    <input type="hidden" id="ec-id">
+    <div class="fsec"><div class="fst">Contact Info</div>
+      <div class="fr"><div class="fg"><label>Full Name *</label><input id="cn" placeholder="e.g. Rahul Patel"></div><div class="fg"><label>Phone</label><input id="cp" placeholder="+91 98765 43210"></div></div>
+      <div class="fr"><div class="fg"><label>Email</label><input type="email" id="ce" placeholder="email@example.com"></div><div class="fg"><label>WhatsApp</label><input id="cw" placeholder="+91 …"></div></div>
+    </div>
+    <div class="fsec"><div class="fst">Location & Source</div>
+      <div class="fr">
+        <div class="fg"><label>Source</label><select id="csrc"><option>Instagram</option><option>Walk-in</option><option>Builder</option><option>Designer</option><option>Referral</option><option>Other</option></select></div>
+        <div class="fg" id="cbg"><label>Branch</label><select id="cbr"></select></div>
+      </div>
+      <div class="fr fr1"><div class="fg"><label>Address</label><input id="ca" placeholder="Home / billing address"></div></div>
+      <div class="fr fr1"><div class="fg"><label>Site / Installation Location</label><input id="cst" placeholder="Where doors will be installed"></div></div>
+    </div>
+    <div class="fsec"><div class="fst">Project Details</div>
+      <div class="fr">
+        <div class="fg"><label>Property Type</label><select id="cpt"><option value="">Select…</option><option>Residential — Flat</option><option>Residential — Bungalow</option><option>Commercial — Office</option><option>Commercial — Shop</option><option>Builder Project</option><option>Other</option></select></div>
+        <div class="fg"><label>Budget Range</label><select id="cbud"><option value="">Select…</option><option>Under ₹50K</option><option>₹50K–1L</option><option>₹1L–3L</option><option>₹3L–5L</option><option>₹5L+</option></select></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>No. of Doors (est.)</label><input type="number" id="cdc" placeholder="e.g. 6" min="1"></div>
+        <div class="fg"><label>Timeline</label><select id="ctl"><option value="">Select…</option><option>Urgent (1–2 weeks)</option><option>1 Month</option><option>2–3 Months</option><option>3–6 Months</option><option>Flexible</option></select></div>
+      </div>
+      <div class="fr fr1"><div class="fg"><label>Notes</label><textarea id="cn2" placeholder="Special requirements, conversation summary…"></textarea></div></div>
+    </div>
+    <div class="fsec"><div class="fst">Lead Status</div>
+      <div class="fr">
+        <div class="fg"><label>Status</label><select id="cstat"><option>New Lead</option><option>Site Visit Scheduled</option><option>Measuring Done</option><option>Quotation Sent</option><option>Confirmed</option><option>On Hold</option><option>Lost</option></select></div>
+        <div class="fg"><label>Assigned To</label><input id="casgn" placeholder="Sales person name"></div>
+      </div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn bs" onclick="closeM('mc')">Cancel</button><button class="btn bp2" onclick="saveC()">Save Customer</button></div>
+</div></div>
+
+<!-- ORDER MODAL -->
+<div class="mo" id="mo2"><div class="md">
+  <div class="mh"><div class="mt" id="mo-t">New Order</div><button class="xb" onclick="closeM('mo2')">✕</button></div>
+  <div class="mb2">
+    <input type="hidden" id="eo-id">
+    <div class="fsec"><div class="fst">Customer</div>
+      <div class="fr fr1"><div class="fg"><label>Select Customer *</label><select id="oc"></select></div></div>
+      <div class="fr">
+        <div class="fg" id="obg"><label>Branch</label><select id="obr"></select></div>
+        <div class="fg"><label>Assigned Installer</label><input id="oinst" placeholder="Installer name"></div>
+      </div>
+    </div>
+    <div class="fsec"><div class="fst">Door Details</div>
+      <div id="dw"></div>
+      <button class="btn bs bsm" onclick="addDoor()" style="margin-top:4px">+ Add Door</button>
+    </div>
+    <div class="fsec"><div class="fst">Order Info</div>
+      <div class="fr">
+        <div class="fg"><label>Order Date</label><input type="date" id="odt"></div>
+        <div class="fg"><label>Promised Delivery</label><input type="date" id="odel"></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Fitting Date</label><input type="date" id="ofit"></div>
+        <div class="fg"><label>Status</label><select id="ost"><option>Pending</option><option>Measuring</option><option>Production</option><option>Ready</option><option>Installed</option><option>Cancelled</option></select></div>
+      </div>
+      <div class="fr fr1"><div class="fg"><label>Total Amount (₹)</label><input type="number" id="oamt" placeholder="e.g. 75000"></div></div>
+      <div class="fr fr1"><div class="fg"><label>Notes</label><textarea id="on2"></textarea></div></div>
+    </div>
+    <div class="fsec"><div class="fst">📐 Drawings & Images</div>
+      <div class="ua" id="dz" onclick="document.getElementById('fi').click()" ondragover="dOv(event)" ondragleave="dLv(event)" ondrop="dDp(event)">
+        <div class="ui">📁</div>
+        <div class="ut">Drag & drop drawings or photos here<br><b>or click to browse</b></div>
+        <div style="font-size:11px;color:var(--mu);margin-top:5px">JPG, PNG, PDF — max 5MB each</div>
+      </div>
+      <input type="file" id="fi" accept="image/*,.pdf" multiple style="display:none" onchange="fIn(event)">
+      <div class="igr" id="ip"></div>
+    </div>
+  </div>
+  <div class="mf"><button class="btn bs" onclick="closeM('mo2')">Cancel</button><button class="btn bp2" onclick="saveO()">Save Order</button></div>
+</div></div>
+
+<!-- CUSTOMER DETAIL -->
+<div class="mo" id="mcd"><div class="md">
+  <div class="mh"><div class="mt">Customer Details</div><button class="xb" onclick="closeM('mcd')">✕</button></div>
+  <div class="mb2" id="cd-b"></div>
+  <div class="mf"><button class="btn bs" onclick="closeM('mcd')">Close</button><button class="btn bp2" id="ecd-btn">Edit</button></div>
+</div></div>
+
+<!-- ORDER DETAIL -->
+<div class="mo" id="mod"><div class="md">
+  <div class="mh"><div class="mt">Order Details</div><button class="xb" onclick="closeM('mod')">✕</button></div>
+  <div class="mb2" id="od-b"></div>
+  <div class="mf"><button class="btn bs" onclick="closeM('mod')">Close</button><button class="btn bp2" id="eod-btn">Edit</button></div>
+</div></div>
+
+<!-- BRANCH MODAL -->
+<div class="mo" id="mb"><div class="md">
+  <div class="mh"><div class="mt" id="mb-t">Add New Branch</div><button class="xb" onclick="closeM('mb')">✕</button></div>
+  <div class="mb2">
+    <input type="hidden" id="eb-id">
+    <div class="fr fr1"><div class="fg"><label>Branch Name *</label><input id="bname" placeholder="e.g. Surat, Mumbai, Rajkot"></div></div>
+    <div class="fr fr1"><div class="fg"><label>City / Location</label><input id="bcity" placeholder="City name"></div></div>
+    <div class="fr fr1"><div class="fg"><label>Branch Password *</label><input type="password" id="bpw" placeholder="Set a password for this branch"></div></div>
+    <div class="fr fr1"><div class="fg"><label>Contact Person</label><input id="bcon" placeholder="Franchise owner / manager name"></div></div>
+    <div class="fr fr1"><div class="fg"><label>Phone</label><input id="bph" placeholder="+91 …"></div></div>
+    <div class="fr fr1"><div class="fg"><label>Notes</label><textarea id="bnt" placeholder="Any notes about this franchise…"></textarea></div></div>
+  </div>
+  <div class="mf"><button class="btn bs" onclick="closeM('mb')">Cancel</button><button class="btn bp2" onclick="saveB()">Save Branch</button></div>
+</div></div>
+
+<!-- LIGHTBOX -->
+<div class="lbox" id="lbox" onclick="closeLB()"><button class="lbx">✕</button><img id="lbi" src="" alt=""></div>
+
+<script>
+// ─── BRANCHES CONFIG ───
+var ADMIN_PW = 'admin123';
+
+function getBr(){
+  var s=localStorage.getItem('mmd_br');
+  return s?JSON.parse(s):[
+    {id:'ahmedabad',name:'Ahmedabad',city:'Ahmedabad',pw:'ahmd2024',contact:'',phone:'',notes:'',def:true},
+    {id:'baroda',name:'Baroda',city:'Vadodara',pw:'brd2024',contact:'',phone:'',notes:'',def:true}
+  ];
+}
+function saveBr(b){localStorage.setItem('mmd_br',JSON.stringify(b));}
+var branches=getBr();
+
+// ─── DATA ───
+function gd(){return{c:JSON.parse(localStorage.getItem('mmd_c')||'[]'),o:JSON.parse(localStorage.getItem('mmd_o')||'[]')};}
+function sd(c,o){localStorage.setItem('mmd_c',JSON.stringify(c));localStorage.setItem('mmd_o',JSON.stringify(o));}
+var cid,oid;
+function gids(){cid=parseInt(localStorage.getItem('mmd_cid')||'1');oid=parseInt(localStorage.getItem('mmd_oid')||'1');}
+function sids(){localStorage.setItem('mmd_cid',cid);localStorage.setItem('mmd_oid',oid);}
+
+var sess=null; // {role:'branch'|'admin', bid, bname}
+var imgs=[];
+// admin dashboard filter state
+var dashBranch='__all';
+
+function myC(bid){
+  var d=gd();
+  var b=bid||sess.bid;
+  if(sess.role==='admin')return bid&&bid!=='__all'?d.c.filter(function(x){return x.bid===bid;}):d.c;
+  return d.c.filter(function(x){return x.bid===sess.bid;});
+}
+function myO(bid){
+  var d=gd();
+  var b=bid||sess.bid;
+  if(sess.role==='admin')return bid&&bid!=='__all'?d.o.filter(function(x){return x.bid===bid;}):d.o;
+  return d.o.filter(function(x){return x.bid===sess.bid;});
+}
+function bname(id){var b=branches.find(function(x){return x.id===id;});return b?b.name:(id||'—');}
+function fmt(v){return v?'₹'+parseInt(v).toLocaleString():'—';}
+
+// ─── LOGIN ───
+
+
+function doLogin(){
+  var pw=document.getElementById('lpw').value.trim();
+  var err=document.getElementById('lerr');
+  err.style.display='none';
+  if(!pw){err.style.display='block';return;}
+  // Admin?
+  if(pw===ADMIN_PW){sess={role:'admin',bid:'admin',bname:'Admin'};launch();return;}
+  // Branch?
+  var b=branches.find(function(x){return x.pw===pw;});
+  if(b){sess={role:'branch',bid:b.id,bname:b.name};launch();return;}
+  err.style.display='block';
+}
+
+function doLogout(){
+  sess=null;dashBranch='__all';
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('ls').style.display='flex';
+  document.getElementById('lpw').value='';
+  branches=getBr();
+  buildHint();
+}
+
+function launch(){
+  gids();branches=getBr();
+  document.getElementById('ls').style.display='none';
+  document.getElementById('app').classList.add('on');
+  buildNav();fillBrDDs();
+  sp('dashboard');
+}
+
+// ─── NAV ───
+function buildNav(){
+  var nav=document.getElementById('nav');
+  var badge=document.getElementById('sbadge');
+  var isA=sess.role==='admin';
+  badge.className='sbadge '+(isA?'sb-adm':'sb-br');
+  badge.textContent=isA?'Admin ★':sess.bname;
+  nav.innerHTML='<button class="nt" onclick="sp(\'dashboard\')">◈ Dashboard</button>'+
+    '<button class="nt" onclick="sp(\'customers\')">◉ Customers</button>'+
+    '<button class="nt" onclick="sp(\'orders\')">◧ Orders</button>'+
+    (isA?'<button class="nt adm" onclick="sp(\'branches\')">🏢 Branches</button>'+
+         '<button class="nt adm" onclick="sp(\'reports\')">📊 Reports</button>':'');
+  // show/hide branch columns
+  var isAdmin=isA;
+  ['d-bth','d-bth2','c-bth','o-bth'].forEach(function(id){
+    var el=document.getElementById(id);
+    if(el)el.textContent=isAdmin?'Branch':'';
+  });
+  if(isAdmin){
+    var bOpts='<option value="">All Branches</option>'+branches.map(function(b){return'<option value="'+b.id+'">'+b.name+'</option>';}).join('');
+    document.getElementById('cs-bf').innerHTML='<select class="flt" id="cs-br" onchange="renderC()">'+bOpts+'</select>';
+    document.getElementById('os-bf').innerHTML='<select class="flt" id="os-br" onchange="renderO()">'+bOpts+'</select>';
+  } else {
+    document.getElementById('cs-bf').innerHTML='';
+    document.getElementById('os-bf').innerHTML='';
+  }
+}
+
+function fillBrDDs(){
+  var isA=sess.role==='admin';
+  var cbr=document.getElementById('cbr');
+  var obr=document.getElementById('obr');
+  var opts=isA?branches.map(function(b){return'<option value="'+b.id+'">'+b.name+'</option>';}).join(''):
+    '<option value="'+sess.bid+'">'+sess.bname+'</option>';
+  cbr.innerHTML=opts;obr.innerHTML=opts;
+  document.getElementById('cbg').style.display=isA?'':'none';
+  document.getElementById('obg').style.display=isA?'':'none';
+}
+
+function sp(p){
+  document.querySelectorAll('.page').forEach(function(x){x.classList.remove('active');});
+  document.querySelectorAll('.nt').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('page-'+p).classList.add('active');
+  var ps=['dashboard','customers','orders','branches','reports'];
+  var tabs=document.querySelectorAll('.nt');
+  var i=ps.indexOf(p);if(i>=0&&tabs[i])tabs[i].classList.add('active');
+  if(p==='dashboard')rDash();
+  if(p==='customers')renderC();
+  if(p==='orders')renderO();
+  if(p==='branches')rBranches();
+  if(p==='reports')rReports();
+}
+
+function openM(id){document.getElementById(id).classList.add('open');}
+function closeM(id){document.getElementById(id).classList.remove('open');}
+
+// ─── BADGE HELPERS ───
+function sb2(s){var m={pending:'bpnd',measuring:'bmsr',production:'bprd',ready:'brdy',installed:'bins',cancelled:'bcnc'};return m[(s||'pending').toLowerCase()]||'bpnd';}
+function lc(s){if(s==='Confirmed')return'bins';if(s==='Lost')return'bcnc';return'bpnd';}
+
+// ─── DASHBOARD ───
+function buildDashSwitcher(){
+  if(sess.role!=='admin'){document.getElementById('pbsw').innerHTML='';return;}
+  var btns='<button class="bsw-btn all'+(dashBranch==='__all'?' on':'')+'" onclick="setDashBr(\'__all\')">All Branches</button>';
+  branches.forEach(function(b){
+    btns+='<button class="bsw-btn'+(dashBranch===b.id?' br-on':'')+'" onclick="setDashBr(\''+b.id+'\')">'+b.name+'</button>';
+  });
+  document.getElementById('pbsw').innerHTML='<div class="bsw">'+btns+'</div>';
+}
+function setDashBr(bid){dashBranch=bid;rDash();}
+
+function rDash(){
+  var isA=sess.role==='admin';
+  var filterBid=isA?dashBranch:'__self';
+  var mc=isA?myC(dashBranch==='__all'?null:dashBranch):myC();
+  var mo=isA?myO(dashBranch==='__all'?null:dashBranch):myO();
+
+  document.getElementById('dstats').innerHTML=
+    '<div class="sc2"><div class="sl">Customers</div><div class="sv">'+mc.length+'</div><div class="ss">'+(isA?(dashBranch==='__all'?'All branches':bname(dashBranch)):sess.bname)+'</div></div>'+
+    '<div class="sc2"><div class="sl">Orders</div><div class="sv">'+mo.length+'</div><div class="ss">All time</div></div>'+
+    '<div class="sc2"><div class="sl">Installed</div><div class="sv">'+mo.filter(function(o){return o.status==='Installed';}).length+'</div><div class="ss">Completed</div></div>'+
+    '<div class="sc2"><div class="sl">Pending</div><div class="sv">'+mo.filter(function(o){return['Pending','Measuring','Production','Ready'].includes(o.status);}).length+'</div><div class="ss">In progress</div></div>';
+
+  if(isA){
+    var allC=gd().c;
+    document.getElementById('ab-wrap').innerHTML='<div class="ab ab-blu"><div class="ab-t">👑 Admin — Consolidated View</div><div class="ab-s">Showing '+branches.length+' branches</div><div class="bpills">'+branches.map(function(b){return'<span class="bpill">'+b.name+': '+allC.filter(function(c){return c.bid===b.id;}).length+' customers</span>';}).join('')+'</div></div>';
+  } else {
+    document.getElementById('ab-wrap').innerHTML='';
+  }
+
+  buildDashSwitcher();
+
+  var rc=[...mc].reverse().slice(0,6);
+  document.getElementById('d-ct').innerHTML=rc.length?rc.map(function(c){return'<tr><td style="font-weight:500">'+c.name+'</td><td>'+(c.phone||'—')+'</td><td><span class="badge bsrc">'+c.source+'</span></td><td>'+(isA?'<span class="badge bbrn">'+bname(c.bid)+'</span>':'')+'</td></tr>';}).join(''):'<tr><td colspan="4"><div class="es" style="padding:16px"><div class="ei">🚪</div>No customers yet</div></td></tr>';
+  var ro=[...mo].reverse().slice(0,6);var allC2=gd().c;
+  document.getElementById('d-ot').innerHTML=ro.length?ro.map(function(o){var c=allC2.find(function(x){return x.id===o.cid;});return'<tr><td style="font-weight:700">#'+o.num+'</td><td>'+(c?c.name:'—')+'</td><td>'+(o.doors||[]).length+'</td><td><span class="badge '+sb2(o.status)+'">'+o.status+'</span></td><td>'+(isA?'<span class="badge bbrn">'+bname(o.bid)+'</span>':'')+'</td></tr>';}).join(''):'<tr><td colspan="5"><div class="es" style="padding:16px">No orders yet</div></td></tr>';
+}
+
+// ─── CUSTOMERS ───
+function renderC(){
+  var s=(document.getElementById('cs-s').value||'').toLowerCase();
+  var sf=document.getElementById('cs-src').value;
+  var bfe=document.getElementById('cs-br');var bf=bfe?bfe.value:'';
+  var custs=(sess.role==='admin'?myC(bf||null):myC()).filter(function(c){
+    return(c.name.toLowerCase().includes(s)||(c.phone||'').includes(s))&&(!sf||c.source===sf);
+  });
+  var isA=sess.role==='admin';
+  document.getElementById('ct2').innerHTML=custs.length?custs.map(function(c){return'<tr>'+
+    '<td style="font-weight:500;cursor:pointer" onclick="vC('+c.id+')">'+c.name+'</td>'+
+    '<td>'+(c.phone||'—')+'</td>'+
+    '<td><span class="badge bsrc">'+c.source+'</span></td>'+
+    '<td>'+(isA?'<span class="badge bbrn">'+bname(c.bid)+'</span>':'')+'</td>'+
+    '<td class="hm"><span class="badge '+lc(c.status)+'" style="font-size:10px">'+(c.status||'New Lead')+'</span></td>'+
+    '<td><button class="btn bs bsm" onclick="eC('+c.id+')">Edit</button> <button class="btn bd bsm" onclick="dC('+c.id+')">✕</button></td>'+
+  '</tr>';}).join(''):'<tr><td colspan="6"><div class="es"><div class="ei">🚪</div>No customers found</div></td></tr>';
+}
+
+function openCM(bid){
+  document.getElementById('ec-id').value='';document.getElementById('mc-t').textContent='New Customer';
+  ['cn','cp','ce','cw','ca','cst','cn2','casgn','cdc'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+  document.getElementById('csrc').value='Instagram';
+  var defBid=bid||(sess.role==='admin'?branches[0].id:sess.bid);
+  document.getElementById('cbr').value=defBid;
+  ['cpt','cbud','ctl'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('cstat').value='New Lead';
+  openM('mc');
+}
+
+function saveC(){
+  var name=document.getElementById('cn').value.trim();if(!name){alert('Please enter customer name');return;}
+  var eid=document.getElementById('ec-id').value;var d=gd();
+  var bid=sess.role==='admin'?document.getElementById('cbr').value:sess.bid;
+  var obj={id:eid?parseInt(eid):cid++,name,
+    phone:document.getElementById('cp').value,email:document.getElementById('ce').value,whatsapp:document.getElementById('cw').value,
+    source:document.getElementById('csrc').value,bid,
+    address:document.getElementById('ca').value,site:document.getElementById('cst').value,
+    property:document.getElementById('cpt').value,budget:document.getElementById('cbud').value,
+    doorCount:document.getElementById('cdc').value,timeline:document.getElementById('ctl').value,
+    status:document.getElementById('cstat').value,assigned:document.getElementById('casgn').value,
+    notes:document.getElementById('cn2').value,
+    createdAt:eid?(d.c.find(function(x){return x.id===parseInt(eid);})||{}).createdAt:new Date().toISOString()
+  };
+  if(eid){var i=d.c.findIndex(function(x){return x.id===parseInt(eid);});d.c[i]=obj;}else d.c.push(obj);
+  sd(d.c,d.o);sids();closeM('mc');renderC();rDash();
+}
+
+function eC(id){
+  var c=gd().c.find(function(x){return x.id===id;});if(!c)return;
+  document.getElementById('ec-id').value=c.id;document.getElementById('mc-t').textContent='Edit Customer';
+  document.getElementById('cn').value=c.name||'';document.getElementById('cp').value=c.phone||'';
+  document.getElementById('ce').value=c.email||'';document.getElementById('cw').value=c.whatsapp||'';
+  document.getElementById('csrc').value=c.source||'Instagram';
+  if(sess.role==='admin')document.getElementById('cbr').value=c.bid||branches[0].id;
+  document.getElementById('ca').value=c.address||'';document.getElementById('cst').value=c.site||'';
+  document.getElementById('cpt').value=c.property||'';document.getElementById('cbud').value=c.budget||'';
+  document.getElementById('cdc').value=c.doorCount||'';document.getElementById('ctl').value=c.timeline||'';
+  document.getElementById('cstat').value=c.status||'New Lead';document.getElementById('casgn').value=c.assigned||'';
+  document.getElementById('cn2').value=c.notes||'';openM('mc');
+}
+
+function dC(id){if(!confirm('Delete this customer?'))return;var d=gd();d.c=d.c.filter(function(x){return x.id!==id;});sd(d.c,d.o);renderC();rDash();}
+
+function vC(id){
+  var c=gd().c.find(function(x){return x.id===id;});if(!c)return;
+  var init=c.name.split(' ').map(function(n){return n[0];}).join('').toUpperCase().slice(0,2);
+  var ro=gd().o.filter(function(o){return o.cid===id;});
+  document.getElementById('cd-b').innerHTML=
+    '<div class="dvh"><div class="dva">'+init+'</div><div><div class="dvn">'+c.name+'</div><div class="dvm">'+(c.phone||'')+(c.email?' · '+c.email:'')+'</div>'+
+    '<div style="margin-top:6px"><span class="badge bbrn">'+bname(c.bid)+'</span> <span class="badge bsrc">'+c.source+'</span></div></div></div>'+
+    '<div class="dvg">'+
+    '<div class="dvf"><label>Property</label><p>'+(c.property||'—')+'</p></div>'+
+    '<div class="dvf"><label>Budget</label><p>'+(c.budget||'—')+'</p></div>'+
+    '<div class="dvf"><label>Doors (est.)</label><p>'+(c.doorCount||'—')+'</p></div>'+
+    '<div class="dvf"><label>Timeline</label><p>'+(c.timeline||'—')+'</p></div>'+
+    '<div class="dvf"><label>Site</label><p>'+(c.site||'—')+'</p></div>'+
+    '<div class="dvf"><label>Status</label><p>'+(c.status||'—')+'</p></div></div>'+
+    (c.notes?'<div class="dvf" style="margin-bottom:12px"><label>Notes</label><p style="margin-top:4px;color:var(--mu)">'+c.notes+'</p></div>':'')+
+    '<div class="sdv"></div><div class="shg">Orders ('+ro.length+')</div>'+
+    (ro.length?ro.map(function(o){return'<div style="padding:8px;background:var(--s2);border-radius:6px;margin-bottom:6px;font-size:13px;display:flex;justify-content:space-between;align-items:center"><span style="font-weight:700">#'+o.num+'</span><span>'+(o.doors||[]).length+' door(s)</span><span class="badge '+sb2(o.status)+'">'+o.status+'</span></div>';}).join(''):'<div style="color:var(--mu);font-size:13px">No orders yet</div>');
+  document.getElementById('ecd-btn').onclick=function(){closeM('mcd');eC(id);};openM('mcd');
+}
+
+// ─── ORDERS ───
+function renderO(){
+  var s=(document.getElementById('os-s').value||'').toLowerCase();
+  var sf=document.getElementById('os-st').value;
+  var bfe=document.getElementById('os-br');var bf=bfe?bfe.value:'';
+  var ords=(sess.role==='admin'?myO(bf||null):myO()).filter(function(o){
+    var c=gd().c.find(function(x){return x.id===o.cid;});
+    return(('#'+o.num).includes(s)||(c&&c.name.toLowerCase().includes(s)))&&(!sf||o.status===sf);
+  });
+  var isA=sess.role==='admin';var allC=gd().c;
+  document.getElementById('ot2').innerHTML=ords.length?ords.map(function(o){
+    var c=allC.find(function(x){return x.id===o.cid;});var ic=(o.images||[]).length;
+    return'<tr>'+
+      '<td style="font-weight:700;cursor:pointer" onclick="vO('+o.id+')">#'+o.num+'</td>'+
+      '<td>'+(c?c.name:'—')+'</td>'+
+      '<td>'+(o.doors||[]).length+'</td>'+
+      '<td><span class="badge '+sb2(o.status)+'">'+o.status+'</span></td>'+
+      '<td class="hm" style="color:var(--mu)">'+(o.delivery||'—')+'</td>'+
+      '<td>'+(isA?'<span class="badge bbrn">'+bname(o.bid)+'</span>':'')+'</td>'+
+      '<td>'+(ic?'<span style="cursor:pointer;color:var(--br);font-weight:600" onclick="vO('+o.id+')">📷 '+ic+'</span>':'—')+'</td>'+
+      '<td><button class="btn bs bsm" onclick="eO('+o.id+')">Edit</button> <button class="btn bd bsm" onclick="dO('+o.id+')">✕</button></td>'+
+    '</tr>';
+  }).join(''):'<tr><td colspan="8"><div class="es"><div class="ei">📋</div>No orders found</div></td></tr>';
+}
+
+function fillCDD(sel){
+  var s=document.getElementById('oc');
+  var mc=sess.role==='admin'?gd().c:myC();
+  s.innerHTML='<option value="">— Select customer —</option>'+mc.map(function(c){return'<option value="'+c.id+'"'+(c.id===sel?' selected':'')+'>'+c.name+(sess.role==='admin'?' ('+bname(c.bid)+')':'')+'</option>';}).join('');
+}
+
+function addDoor(d){
+  var w=document.getElementById('dw');var idx=w.children.length;
+  var el=document.createElement('div');el.className='di';
+  el.innerHTML='<div class="dih"><div class="dil">Door '+(idx+1)+'</div><button class="btn bd bsm" onclick="this.closest(\'.di\').remove()">Remove</button></div>'+
+    '<div class="fr"><div class="fg"><label>Type</label><select class="dt"><option>Main Door</option><option>Bedroom Door</option><option>Bathroom Door</option><option>Sliding Door</option><option>Wardrobe</option><option>Cabinet</option><option>Other</option></select></div>'+
+    '<div class="fg"><label>Finish</label><select class="df3"><option>Laminate</option><option>Veneer</option><option>Paint</option><option>PU Polish</option><option>Duco</option><option>Other</option></select></div></div>'+
+    '<div class="fr"><div class="fg"><label>Width (mm)</label><input type="number" class="dw3" placeholder="900" value="'+(d?d.w:'')+'"></div>'+
+    '<div class="fg"><label>Height (mm)</label><input type="number" class="dh3" placeholder="2100" value="'+(d?d.h:'')+'"></div></div>'+
+    '<div class="fr fr1"><div class="fg"><label>Design Notes</label><input class="dn3" placeholder="e.g. Teak veneer, panel design" value="'+(d?d.n:'')+'"></div></div>';
+  if(d){el.querySelector('.dt').value=d.type||'Main Door';el.querySelector('.df3').value=d.fin||'Laminate';}
+  w.appendChild(el);
+}
+
+function gDoors(){return Array.from(document.getElementById('dw').children).map(function(el){return{type:el.querySelector('.dt').value,fin:el.querySelector('.df3').value,w:el.querySelector('.dw3').value,h:el.querySelector('.dh3').value,n:el.querySelector('.dn3').value};});}
+
+function openOM(){
+  document.getElementById('eo-id').value='';document.getElementById('mo-t').textContent='New Order';
+  document.getElementById('obr').value=sess.role==='admin'?branches[0].id:sess.bid;
+  document.getElementById('oinst').value='';document.getElementById('odt').value=new Date().toISOString().split('T')[0];
+  document.getElementById('odel').value='';document.getElementById('ofit').value='';
+  document.getElementById('ost').value='Pending';document.getElementById('on2').value='';document.getElementById('oamt').value='';
+  imgs=[];renderIP();fillCDD();document.getElementById('dw').innerHTML='';addDoor();openM('mo2');
+}
+
+function saveO(){
+  var cid2=parseInt(document.getElementById('oc').value);if(!cid2){alert('Please select a customer');return;}
+  var eid=document.getElementById('eo-id').value;var d=gd();
+  var ex=eid?d.o.find(function(x){return x.id===parseInt(eid);}):null;
+  var bid=sess.role==='admin'?document.getElementById('obr').value:sess.bid;
+  var obj={id:eid?parseInt(eid):oid++,num:ex?ex.num:(oid-1),cid:cid2,bid,
+    installer:document.getElementById('oinst').value,doors:gDoors(),
+    date:document.getElementById('odt').value,delivery:document.getElementById('odel').value,
+    fitting:document.getElementById('ofit').value,status:document.getElementById('ost').value,
+    amount:document.getElementById('oamt').value,notes:document.getElementById('on2').value,
+    images:imgs,createdAt:ex?ex.createdAt:new Date().toISOString()
+  };
+  if(!obj.num)obj.num=obj.id;
+  if(eid){var i=d.o.findIndex(function(x){return x.id===parseInt(eid);});d.o[i]=obj;}else d.o.push(obj);
+  sd(d.c,d.o);sids();closeM('mo2');renderO();rDash();
+}
+
+function eO(id){
+  var d=gd();var o=d.o.find(function(x){return x.id===id;});if(!o)return;
+  document.getElementById('eo-id').value=o.id;document.getElementById('mo-t').textContent='Edit Order #'+o.num;
+  fillCDD(o.cid);if(sess.role==='admin')document.getElementById('obr').value=o.bid||branches[0].id;
+  document.getElementById('oinst').value=o.installer||'';document.getElementById('odt').value=o.date||'';
+  document.getElementById('odel').value=o.delivery||'';document.getElementById('ofit').value=o.fitting||'';
+  document.getElementById('ost').value=o.status||'Pending';document.getElementById('on2').value=o.notes||'';document.getElementById('oamt').value=o.amount||'';
+  document.getElementById('dw').innerHTML='';
+  (o.doors||[{type:'Main Door',fin:'Laminate',w:'',h:'',n:''}]).forEach(function(dr){addDoor(dr);});
+  imgs=o.images?[...o.images]:[];renderIP();openM('mo2');
+}
+
+function dO(id){if(!confirm('Delete this order?'))return;var d=gd();d.o=d.o.filter(function(x){return x.id!==id;});sd(d.c,d.o);renderO();rDash();}
+
+function vO(id){
+  var d=gd();var o=d.o.find(function(x){return x.id===id;});if(!o)return;
+  var c=d.c.find(function(x){return x.id===o.cid;});
+  document.getElementById('od-b').innerHTML=
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">'+
+      '<div><div style="font-size:18px;font-weight:700">#'+o.num+'</div><div style="color:var(--mu);font-size:13px">'+(c?c.name:'Unknown')+' · '+bname(o.bid)+'</div></div>'+
+      '<span class="badge '+sb2(o.status)+'" style="font-size:13px;padding:5px 12px">'+o.status+'</span>'+
+    '</div>'+
+    '<div class="dvg" style="margin-bottom:14px">'+
+      '<div class="dvf"><label>Order Date</label><p>'+(o.date||'—')+'</p></div>'+
+      '<div class="dvf"><label>Delivery</label><p>'+(o.delivery||'—')+'</p></div>'+
+      '<div class="dvf"><label>Fitting Date</label><p>'+(o.fitting||'—')+'</p></div>'+
+      '<div class="dvf"><label>Amount</label><p>'+fmt(o.amount)+'</p></div>'+
+    '</div>'+
+    '<div class="sdv"></div><div class="shg">Doors ('+(o.doors||[]).length+')</div>'+
+    (o.doors||[]).map(function(dr,i){return'<div style="padding:10px 12px;background:var(--s2);border-radius:6px;margin-bottom:6px;font-size:13px"><div style="font-weight:700;margin-bottom:3px">Door '+(i+1)+' — '+dr.type+'</div><div style="color:var(--mu)">'+dr.fin+(dr.w?' · '+dr.w+'×'+dr.h+'mm':'')+'</div>'+(dr.n?'<div style="margin-top:3px;color:var(--mu)">'+dr.n+'</div>':'')+'</div>';}).join('')+
+    (o.notes?'<div class="sdv"></div><div class="dvf"><label>Notes</label><p style="margin-top:4px;color:var(--mu)">'+o.notes+'</p></div>':'')+
+    (o.images&&o.images.length?'<div class="sdv"></div><div class="shg">Drawings & Images ('+o.images.length+')</div><div class="imgr">'+o.images.map(function(img){return'<img src="'+img.data+'" title="'+img.name+'" onclick="openLB(\''+img.data+'\')">';}).join('')+'</div>':'');
+  document.getElementById('eod-btn').onclick=function(){closeM('mod');eO(id);};openM('mod');
+}
+
+// ─── BRANCHES (ADMIN) ───
+function rBranches(){
+  var d=gd();
+  document.getElementById('blist').innerHTML=branches.map(function(b){
+    var bc=d.c.filter(function(c){return c.bid===b.id;}).length;
+    var bo=d.o.filter(function(o){return o.bid===b.id;}).length;
+    return'<div class="bcard">'+
+      '<div class="brow">'+
+        '<div class="bri"><div class="brl2">🏢 '+b.name+(b.def?' <span style="font-size:10px;font-weight:400;color:var(--mu)">(default)</span>':'')+'</div>'+
+        '<div class="brs">'+b.city+' · '+bc+' customers · '+bo+' orders · Password: <code style="background:var(--s2);padding:1px 6px;border-radius:3px;font-size:11px">'+b.pw+'</code></div></div>'+
+        '<div style="display:flex;gap:7px">'+
+          '<button class="btn bs bsm" onclick="eBr(\''+b.id+'\')">Edit</button>'+
+          (b.def?'':'<button class="btn bd bsm" onclick="delB(\''+b.id+'\')">Remove</button>')+
+        '</div>'+
+      '</div>'+
+      (b.contact?'<div class="brow"><div class="bri"><div class="brl2">Contact: '+b.contact+'</div><div class="brs">'+(b.phone||'')+'</div></div></div>':'')+
+    '</div>';
+  }).join('');
+}
+
+function openBM(){
+  document.getElementById('eb-id').value='';document.getElementById('mb-t').textContent='Add New Branch';
+  ['bname','bcity','bpw','bcon','bph','bnt'].forEach(function(id){document.getElementById(id).value='';});openM('mb');
+}
+
+function eBr(id){
+  var b=branches.find(function(x){return x.id===id;});if(!b)return;
+  document.getElementById('eb-id').value=b.id;document.getElementById('mb-t').textContent='Edit — '+b.name;
+  document.getElementById('bname').value=b.name;document.getElementById('bcity').value=b.city;
+  document.getElementById('bpw').value=b.pw;document.getElementById('bcon').value=b.contact||'';
+  document.getElementById('bph').value=b.phone||'';document.getElementById('bnt').value=b.notes||'';openM('mb');
+}
+
+function saveB(){
+  var name=document.getElementById('bname').value.trim();var pw=document.getElementById('bpw').value.trim();
+  if(!name||!pw){alert('Branch name and password required');return;}
+  var eid=document.getElementById('eb-id').value;
+  if(eid){
+    var i=branches.findIndex(function(x){return x.id===eid;});
+    branches[i]=Object.assign({},branches[i],{name,city:document.getElementById('bcity').value,pw,contact:document.getElementById('bcon').value,phone:document.getElementById('bph').value,notes:document.getElementById('bnt').value});
+  } else {
+    var nid=name.toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+    if(branches.find(function(x){return x.id===nid;}))nid=nid+Date.now();
+    branches.push({id:nid,name,city:document.getElementById('bcity').value,pw,contact:document.getElementById('bcon').value,phone:document.getElementById('bph').value,notes:document.getElementById('bnt').value,def:false});
+  }
+  saveBr(branches);fillBrDDs();
+  // Rebuild filter dropdowns
+  var bOpts='<option value="">All Branches</option>'+branches.map(function(b){return'<option value="'+b.id+'">'+b.name+'</option>';}).join('');
+  document.getElementById('cs-bf').innerHTML='<select class="flt" id="cs-br" onchange="renderC()">'+bOpts+'</select>';
+  document.getElementById('os-bf').innerHTML='<select class="flt" id="os-br" onchange="renderO()">'+bOpts+'</select>';
+  closeM('mb');rBranches();buildDashSwitcher();
+}
+
+function delB(id){
+  var d=gd();var bc=d.c.filter(function(c){return c.bid===id;}).length;var bo=d.o.filter(function(o){return o.bid===id;}).length;
+  if(bc+bo>0){alert('Cannot delete — '+bc+' customers and '+bo+' orders exist. Reassign them first.');return;}
+  if(!confirm('Remove this branch?'))return;
+  branches=branches.filter(function(x){return x.id!==id;});saveBr(branches);rBranches();buildDashSwitcher();
+}
+
+// ─── REPORTS (ADMIN) ───
+function rReports(){
+  var d=gd();var totalRev=d.o.reduce(function(s,o){return s+(parseInt(o.amount)||0);},0);
+  var html='<div class="card" style="background:var(--acc);color:white;margin-bottom:14px">'+
+    '<div class="ct" style="color:rgba(255,255,255,.6);margin-bottom:10px">Total — All Branches</div>'+
+    '<div style="display:flex;gap:24px;flex-wrap:wrap">'+
+      '<div><div style="font-size:28px;font-weight:700">'+d.c.length+'</div><div style="font-size:12px;opacity:.7">Customers</div></div>'+
+      '<div><div style="font-size:28px;font-weight:700">'+d.o.length+'</div><div style="font-size:12px;opacity:.7">Orders</div></div>'+
+      '<div><div style="font-size:28px;font-weight:700">'+d.o.filter(function(o){return o.status==='Installed';}).length+'</div><div style="font-size:12px;opacity:.7">Installed</div></div>'+
+      '<div><div style="font-size:28px;font-weight:700">'+(totalRev?'₹'+totalRev.toLocaleString():'—')+'</div><div style="font-size:12px;opacity:.7">Total Revenue</div></div>'+
+    '</div>'+
+  '</div>';
+  branches.forEach(function(b){
+    var bc=d.c.filter(function(c){return c.bid===b.id;});var bo=d.o.filter(function(o){return o.bid===b.id;});
+    var rev=bo.reduce(function(s,o){return s+(parseInt(o.amount)||0);},0);
+    html+='<div class="card">'+
+      '<div class="ch"><div class="ct" style="font-size:13px;color:var(--tx)">🏢 '+b.name+' — '+b.city+'</div></div>'+
+      '<div class="sg" style="margin-bottom:0">'+
+        '<div class="sc2"><div class="sl">Customers</div><div class="sv" style="font-size:20px">'+bc.length+'</div></div>'+
+        '<div class="sc2"><div class="sl">Orders</div><div class="sv" style="font-size:20px">'+bo.length+'</div></div>'+
+        '<div class="sc2"><div class="sl">Installed</div><div class="sv" style="font-size:20px">'+bo.filter(function(o){return o.status==='Installed';}).length+'</div></div>'+
+        '<div class="sc2"><div class="sl">Revenue</div><div class="sv" style="font-size:18px">'+(rev?'₹'+rev.toLocaleString():'—')+'</div></div>'+
+      '</div>'+
+    '</div>';
+  });
+  document.getElementById('rep').innerHTML=html;
+}
+
+// ─── IMAGES ───
+function dOv(e){e.preventDefault();e.currentTarget.classList.add('ov');}
+function dLv(e){e.currentTarget.classList.remove('ov');}
+function dDp(e){e.preventDefault();e.currentTarget.classList.remove('ov');pF(e.dataTransfer.files);}
+function fIn(e){pF(e.target.files);e.target.value='';}
+function pF(files){Array.from(files).forEach(function(f){if(f.size>5*1024*1024){alert(f.name+' exceeds 5MB');return;}var r=new FileReader();r.onload=function(ev){imgs.push({name:f.name,data:ev.target.result,type:f.type});renderIP();};r.readAsDataURL(f);});}
+function renderIP(){document.getElementById('ip').innerHTML=imgs.map(function(img,i){var isI=img.type&&img.type.startsWith('image/');return'<div class="pi">'+(isI?'<img src="'+img.data+'" onclick="openLB(\''+img.data+'\')">':'<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;background:var(--s2)">📄</div>')+'<div class="pl">'+img.name+'</div><button class="pr" onclick="imgs.splice('+i+',1);renderIP()">✕</button></div>';}).join('');}
+function openLB(s){document.getElementById('lbi').src=s;document.getElementById('lbox').classList.add('open');}
+function closeLB(){document.getElementById('lbox').classList.remove('open');}
+
+// ─── INIT ───
+</script>
+</body>
+</html>
